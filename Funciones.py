@@ -14,21 +14,24 @@ def hash_password(password):
 
 
 def guardar_usuario(line):
-    conn = sqlite3.connect("data.db")  # tu base de datos
+    conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
-    codigo_str, user_id, password, = line.split(",")
+    codigo_str, user_id, password = line.split(",")
+
     try:
         hashed_password = hash_password(password)
         cursor.execute("""
-        INSERT INTO usuario (user, password)
-        VALUES (?, ?)
+            INSERT INTO usuario (user, password)
+            VALUES (?, ?)
         """, (user_id, hashed_password))
 
         conn.commit()
         print(f"Usuario {user_id} guardado correctamente.")
+        return True   # ⬅ SE REGISTRÓ CORRECTAMENTE
 
     except sqlite3.IntegrityError as e:
         print("Error al guardar usuario:", e)
+        return False  # ⬅ NO SE REGISTRÓ
 
     finally:
         conn.close()
